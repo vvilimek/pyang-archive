@@ -461,7 +461,12 @@ class SidFile:
         module_name_absent = True
 
         for key in self.content:
-            if key == 'module-name':
+            if key == 'assignment-range':
+                if not isinstance(self.content[key], list):
+                    raise SidFileError("key 'assignment-range', invalid  value.")
+                self.validate_ranges(self.content[key])
+
+            elif key == 'module-name':
                 # Further validation will be done during searching the module
                 module_name_absent = False
 
