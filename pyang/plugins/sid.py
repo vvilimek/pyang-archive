@@ -727,6 +727,7 @@ class SidFile:
             elif statement.keyword == 'action':
                 self.merge_item('data', self.get_path(statement, prefix))
                 for substmt in statement.i_children:
+                    self.merge_item('data', "%s/%s" % (self.get_path(statement, prefix), substmt.keyword))
                     if substmt.keyword in self.inrpc_keywords:
                         # RFC 9595, Appendix B require to create SID for all
                         # action input and output schema nodes
