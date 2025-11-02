@@ -1131,7 +1131,7 @@ class SidFile:
             print("Finalizing unstable allocations to %s"
                   % (self.module_revision))
             for item in sid_cont['item']:
-                if item['status'] == 'unstable':
+                if item.get('status', 'stable') == 'unstable':
                     print("  finalized %s" % (item['identifier']))
                     # status 'stable' is default enum
                     del item['status']
