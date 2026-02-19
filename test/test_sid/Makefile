@@ -5,7 +5,8 @@ PYANG?= pyang
 	test24 test25 test26 test27 test28 test29 test30 test31 test32 test33 test34
 test: test1 test2 test3 test4 test5 test6 test7 test8 test9 test10 test11 \
 	test12 test14 test15 test16 test17 test18 test19 test20 test21 test22 \
-	test23 test24 test25 test26 test27 test28 test29 test30 test31 test32 test33 test34
+	test23 test24 test25 test26 test27 test28 test29 test30 test31 test32 \
+	test33 test34 test39
 
 test1:
 	# Test help
@@ -195,4 +196,25 @@ test34: aug-a@2025-08-25.yang aug-b@2025-08-25.yang aug-c@2025-08-25.yang test-3
 	$(PYANG) --sid-generate-file 1200:100 aug-c@2025-08-25.yang --sid-finalize >/dev/null 2>/dev/null
 	diff -b aug-c@2025-08-25.sid test-34-expected-aug-c.sid
 	rm aug-a@2025-08-25.sid aug-b@2025-08-25.sid aug-c@2025-08-25.sid
+
+IETF_SNMP = ../../modules/ietf/ietf-snmp.yang
+IETF_SNMP_COMMON = ../../modules/ietf/ietf-snmp-common.yang
+IETF_SNMP_ENGINE = ../../modules/ietf/ietf-snmp-engine.yang
+IETF_SNMP_TARGET = ../../modules/ietf/ietf-snmp-target.yang
+IETF_SNMP_NOTIFICATION = ../../modules/ietf/ietf-snmp-notification.yang
+IETF_SNMP_PROXY = ../../modules/ietf/ietf-snmp-proxy.yang
+IETF_SNMP_COMMUNITY = ../../modules/ietf/ietf-snmp-community.yang
+IETF_SNMP_USM = ../../modules/ietf/ietf-snmp-usm.yang
+IETF_SNMP_TSM = ../../modules/ietf/ietf-snmp-tsm.yang
+IETF_SNMP_VACM = ../../modules/ietf/ietf-snmp-vacm.yang
+IETF_SNMP_TLS = ../../modules/ietf/ietf-snmp-tls.yang
+IETF_SNMP_SSH = ../../modules/ietf/ietf-snmp-ssh.yang
+
+test39: $(IETF_SNMP) $(IETF_SNMP_COMMON) $(IETF_SNMP_ENGINE) $(IETF_SNMP_TARGET) $(IETF_SNMP_NOTIFICATION) $(IETF_SNMP_PROXY) $(IETF_SNMP_COMMUNITY) $(IETF_SNMP_USM) $(IETF_SNMP_TSM) $(IETF_SNMP_VACM) $(IETF_SNMP_TLS) $(IETF_SNMP_SSH)
+	$(PYANG) --sid-generate-file 60000:1000 $(IETF_SNMP) 2>&1 >/dev/null
+	diff -b ietf-snmp@2014-12-10.sid test-39-expected-ietf-snmp@2014-12-10.sid
+	rm ietf-snmp@2014-12-10.sid
+
+test40: $(IETF_SNMP_COMMON)
+	$(PYANG) --sid-generate-file 61000:1000 $(IETF_SNMP_COMMON) 2>&1 | diff -b test-40-expected-output.txt -
 

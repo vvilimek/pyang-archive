@@ -175,6 +175,7 @@ YANG Schema Item iDentifiers (SID) are globally unique unsigned integers used
 to identify YANG items. SIDs are used instead of names to save space in
 constrained applications such as COREconf. This plugin is used to automatically
 generate and updated .sid files used to persist and distribute SID assignments.
+Note that the yang-filename must contain a YANG module not a YANG submodule.
 
 
 COMMANDS
@@ -311,6 +312,10 @@ class SidFile:
         self.update = False
 
     def process_sid_file(self, module):
+        # SID are assigned in context of one namespace, the module defines new namespace.
+        # All submodule live in the parent namespace.
+        if module.keyword == 'submodule':
+            raise SidParsingError(".sid files can be only generated for YANG modules. Generation of .sid files for YANG submodules is prohibited.")
         self.module_name = module.i_modulename
         self.module_revision = util.get_latest_revision(module)
         if self.module_revision != 'unknown':
@@ -670,9 +675,10 @@ class SidFile:
 
         self.merge_item('module', self.module_name)
 
-        for name in module.i_ctx.modules:
-            if module.i_ctx.modules[name].keyword == 'submodule':
-                self.merge_item('module', module.i_ctx.modules[name].arg)
+        # do not generate SIDs for submodules
+        #for name in module.i_ctx.modules:
+        #    if module.i_ctx.modules[name].keyword == 'submodule':
+        #        self.merge_item('module', module.i_ctx.modules[name].arg)
 
         for feature in module.i_features:
             self.merge_item('feature', feature)
@@ -757,8 +763,6 @@ class SidFile:
     def get_path(self, statement, prefix=""):
         path = ""
 
-        #breakpoint()
-
         while statement.i_module is not None:
             if (statement.keyword != 'grouping'
                     and not self.has_yang_data_extension(statement)):
@@ -775,14 +779,14 @@ class SidFile:
 
                 if (prefix != "" or
                         (parent.i_module is not None and
-                         parent.i_module == statement.i_module) or
+                         parent.main_module() == statement.main_module()) or
                         (statement.keyword == 'case' and 
-                         statement.i_module == statement.parent.i_module) or
+                         statement.main_module() == statement.parent.main_module()) or
                         (statement.parent.keyword == 'case' and 
-                         statement.i_module == statement.parent.i_module)):
+                         statement.main_module() == statement.parent.main_module())):
                     path = "/" + statement.arg + path
                 else:
-                    path = "/" + statement.i_module.arg + ":" + statement.arg \
+                    path = "/" + statement.main_module().arg + ":" + statement.arg \
                             + path
 
             statement = statement.parent
