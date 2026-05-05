@@ -9,6 +9,7 @@ TIME_RE = [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}Z
 	test12 test14 test15 test16 test17 test18 test19 test20 test21 test22 test23 \
 	test24 test25 test26 test27 test28 test29 test30 test31 test32 test33 test34 \
 	test35 test36 test37 test38 test39 test40
+
 test: test1 test2 test3 test4 test5 test6 test7 test8 test9 test10 test11 \
 	test12 test14 test15 test16 test17 test18 test19 test20 test21 test22 \
 	test23 test24 test25 test26 test27 test28 test29 test30 test31 test32 \
@@ -290,4 +291,3 @@ test39: $(IETF_SNMP) $(IETF_SNMP_COMMON) $(IETF_SNMP_ENGINE) $(IETF_SNMP_TARGET)
 
 test40: $(IETF_SNMP_COMMON)
 	$(PYANG) --sid-generate-file 61000:1000 $(IETF_SNMP_COMMON) 2>&1 | diff -b test-40-expected-output.txt -
-
