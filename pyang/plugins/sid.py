@@ -782,8 +782,7 @@ class SidFile:
                                 typename.append(t.arg)
                 self.merge_item('data', self.get_path(statement, prefix), typename)
 
-            elif (statement.keyword in self.container_keywords or
-                  statement.keyword in self.choice_keywords):
+            elif statement.keyword in self.container_keywords:
                 self.merge_item('data', self.get_path(statement, prefix))
                 if self.sid_extension:
                     if statement.keyword == "list": # if list add list-id : [key-id, ...]
@@ -796,6 +795,10 @@ class SidFile:
                             pass
 
                         self.content["key-mapping"][self.get_path(statement, prefix)] = keys
+                self.collect_inner_data_nodes(statement.i_children, prefix)
+
+            elif statement.keyword in self.choice_keywords:
+                #self.merge_item('data', self.get_path(statement, prefix))
                 self.collect_inner_data_nodes(statement.i_children, prefix)
 
             elif statement.keyword == 'action':
@@ -860,14 +863,13 @@ class SidFile:
                          statement.main_module() == statement.parent.main_module()) or
                         (statement.parent.keyword == 'case' and
                          statement.main_module() == statement.parent.main_module())):
-                    path = "/" + statement.arg + path
+                    if statement.keyword not in ('case', 'choice'):
+                        path = "/" + statement.arg + path
                 else:
                     path = "/" + statement.main_module().arg + ":" + statement.arg \
                             + path
 
             statement = statement.parent
-
-        #print ("<=", prefix, '+', path)
         return prefix + path
 
     def merge_item(self, namespace, identifier, typename=None):
