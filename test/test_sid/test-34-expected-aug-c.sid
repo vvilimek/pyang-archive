@@ -27,7 +27,7 @@
       },
       {
         "namespace": "data",
-        "identifier": "/aug-a:top-level/aug-b:d/aug-c:d",
+        "identifier": "/aug-c:d",
         "sid": "1201"
       }
     ]

@@ -1,4 +1,4 @@
-test: test_xpath test_deviation test_deviation_show test_all test_rpc_notif test_filter_keyword test_filter_primitive test_filter_flag test_all_keyed test_keys test_ref_units_mand_def test_rootmodule
+test: test_xpath test_deviation test_deviation_show test_all test_rpc_notif test_filter_keyword test_filter_primitive test_filter_flag test_all_keyed test_keys test_rootmodule test_ref_units_mand_def
 
 test_xpath:
 	pyang -f flatten interfaces-ext.yang ietf-yang-types.yang ietf-interfaces.yang | diff benchmarks/ietf-interfaces.xpath.csv -
