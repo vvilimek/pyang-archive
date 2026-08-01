@@ -867,7 +867,7 @@ class SidFile:
                 self.collect_inner_data_nodes(substmt.i_children, filter=submod.i_main_module)
             elif substmt.keyword == \
                     ('ietf-yang-structure-ext', 'augment-structure'):
-                self.collect_inner_data_nodes([substmt], filter=submod.main_module())
+                self.collect_inner_data_nodes(substmt.i_children, filter=submod.i_main_module)
 
     def collect_in_leaf(self, statement):
         if self.sid_extension:
@@ -978,6 +978,7 @@ class SidFile:
             yield module
             for include in module.search("include"):
                 rev = include.search_one("revision-date")
+                # TODO pyang uses 'unknown' not None for missing revisions
                 submod = module.i_ctx.get_module(include.arg, rev.arg if rev else None)
                 assert submod is not None
                 yield submod
@@ -989,6 +990,7 @@ class SidFile:
                 module_name = import_stmt.arg
                 dep['module-name'] = module_name
                 rev_stmt = import_stmt.search_one('revision-date')
+                # TODO pyang uses 'unknown' not None for missing revisions
                 revision = rev_stmt.arg if rev_stmt is not None else None
                 if revision is None:
                     entries = list(filter(

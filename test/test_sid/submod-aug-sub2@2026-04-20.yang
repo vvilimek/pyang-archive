@@ -5,6 +5,10 @@ submodule submod-aug-sub2 {
     prefix sam;
   }
 
+  import ietf-yang-structure-ext {
+    prefix sx;
+  }
+
   import submod-aug-dest {
     prefix sad;
   }
@@ -15,5 +19,33 @@ submodule submod-aug-sub2 {
     leaf new-node-sub2 {
       type uint32;
     }
+  }
+
+  grouping base-group {
+    leaf name-1 { type string; }
+    container cont-node;
+  }
+
+  grouping augmented-group {
+     uses base-group;
+     /*
+      * // uses + augment simply do not work
+      *
+      * uses base-group {
+      *   augment cont-node {
+      *     leaf group-augmented-node { type empty; }
+      *   }
+      * }
+      */
+  }
+
+  grouping ext-group {
+    leaf name-2 { type empty; }
+    uses augmented-group;
+  }
+
+  sx:augment-structure "/sad:proto-msg" {
+    uses ext-group;
+    // TODO: uses augment construction does not work
   }
 }

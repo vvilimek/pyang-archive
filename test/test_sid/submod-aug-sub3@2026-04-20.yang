@@ -12,7 +12,7 @@ submodule submod-aug-sub3 {
   revision 2026-04-20;
   revision 2026-04-15;
 
-  augment "/sad:destination" {
+  grouping reusable-group {
     leaf new-node1-sub3 {
       type int16;
     }
@@ -20,5 +20,9 @@ submodule submod-aug-sub3 {
     leaf new-node2-sub3 {
       type empty;
     }
+  }
+
+  augment "/sad:destination" {
+    uses reusable-group;
   }
 }

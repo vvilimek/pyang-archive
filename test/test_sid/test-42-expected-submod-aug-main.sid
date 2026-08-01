@@ -5,6 +5,10 @@
     "description": "pyang description",
     "dependency-revision": [
       {
+        "module-name": "ietf-yang-structure-ext",
+        "module-revision": "2020-06-17"
+      },
+      {
         "module-name": "submod-aug-dest",
         "module-revision": "2026-04-15"
       }
@@ -63,6 +67,24 @@
         "identifier": "/submod-aug-dest:destination/submod-aug-main:new-node2-sub3",
         "status": "unstable",
         "sid": "1207"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/submod-aug-dest:proto-msg/submod-aug-main:cont-node",
+        "status": "unstable",
+        "sid": "1208"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/submod-aug-dest:proto-msg/submod-aug-main:name-1",
+        "status": "unstable",
+        "sid": "1209"
+      },
+      {
+        "namespace": "data",
+        "identifier": "/submod-aug-dest:proto-msg/submod-aug-main:name-2",
+        "status": "unstable",
+        "sid": "1210"
       }
     ]
   }

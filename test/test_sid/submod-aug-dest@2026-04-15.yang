@@ -4,6 +4,10 @@ module submod-aug-dest {
   prefix sad;
   namespace "http://example.com/ns/submod-aug-dest";
 
+  import ietf-yang-structure-ext {
+     prefix sx;
+  }
+
   revision 2026-04-15;
 
   container destination {
@@ -11,12 +15,39 @@ module submod-aug-dest {
         type uint32;
      }
 
-     container dest-container-no-sid {
+     grouping ignored-grouping-2 {
+        leaf a { type int32; }
+        leaf b { type int32; }
      }
+
+     container dest-container-no-sid {
+        uses ignored-grouping-2;
+     }
+  }
+
+  // structure destination
+  sx:structure proto-msg {
+    leaf proto-version {
+      type string;
+    }
+
+    leaf proto-oper {
+      type string;
+    }
   }
 
   leaf no-sid-for-me-either {
      type string;
   }
-  container ignored {}
+
+  grouping ignored-grouping-1 {
+     container pair {
+         leaf x { type string; }
+         leaf y { type string; }
+     }
+  }
+
+  container ignored {
+    uses ignored-grouping-1;
+  }
 }
