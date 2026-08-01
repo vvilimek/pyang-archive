@@ -782,25 +782,37 @@ class SidFile:
             self.merge_item('identity', identity)
 
 
+        # In principle, the schema tree contains even the augmented nodes.
+        # But it is much faster to iterate over augmentation statements than to walk the whole schema tree.
+        # This is because the augmentation statement must be present as a top-level statement and
+        # also the augmentation statement precisly describe the destination place (for example in external module).
         for substmt in module.substmts:
             if substmt.keyword == 'augment':
                 target = substmt.i_target_node
+                if target.keyword == 'grouping':
+                    continue
+
                 if target.keyword != 'choice' and target.parent not in ('module', 'submodule'):
-                    self.collect_in_substmts(substmt.substmts)
+                    self.collect_inner_data_nodes(substmt.substmts)
                 else:
                     # Do not emit items for top-level case nodes (case nodes children of toplevel choice)
-                    for case_child in substmt.i_children:
-                        self.collect_in_substmts(case_child.substmts)
+
+                    self.collect_inner_data_nodes(substmt.substmts, filter=module)
+                    #for case_child in substmt.i_children:
+                    #    self.collect_in_substmts(case_child.substmts)
             elif substmt.keyword == 'include':
                 self.collect_augment_in_submod(substmt, module.i_ctx)
             elif self.has_yang_data_extension(substmt):
-                self.collect_in_substmts(substmt.substmts)
+                self.collect_inner_data_nodes(substmt.i_children)
             elif substmt.keyword == \
                     ('ietf-yang-structure-ext', 'augment-structure'):
-                self.collect_in_substmts(substmt.substmts)
+                self.collect_inner_data_nodes(substmt.substmts)
 
-    def collect_inner_data_nodes(self, statements, prefix=""):
+    def collect_inner_data_nodes(self, statements, prefix="", filter=None):
         for statement in statements:
+            if filter and statement.main_module() != filter:
+                continue
+
             if statement.keyword in self.leaf_keywords:
                 self.collect_in_leaf(statement)
 
@@ -818,7 +830,6 @@ class SidFile:
                 self.collect_inner_data_nodes(statement.i_children, prefix)
 
             elif statement.keyword in self.choice_keywords:
-                #self.merge_item('data', self.get_path(statement, prefix))
                 self.collect_inner_data_nodes(statement.i_children, prefix)
 
             elif statement.keyword == 'action':
@@ -838,21 +849,6 @@ class SidFile:
                 self.merge_item('data', self.get_path(statement, prefix))
                 self.collect_inner_data_nodes(statement.i_children, prefix)
 
-    def collect_in_substmts(self, substmts):
-        for statement in substmts:
-            if statement.keyword in self.leaf_keywords:
-                self.collect_in_leaf(statement)
-
-            elif (statement.keyword in self.container_keywords or
-                  statement.keyword in self.choice_keywords):
-                self.merge_item('data', self.get_path(statement))
-                self.collect_in_substmts(statement.substmts)
-
-            elif statement.keyword == 'uses':
-                prefix = self.get_path(statement.parent)
-                self.collect_inner_data_nodes(statement.i_grouping.i_children,
-                                              prefix)
-
     def collect_augment_in_submod(self, submod_include: statements.Statement, ctx: context.Context):
         assert submod_include.keyword == 'include'
         submod_rev = submod_include.search_one('revision-date')
@@ -864,7 +860,14 @@ class SidFile:
         # augment must be at module/submodule toplevel
         for substmt in submod.substmts:
             if substmt.keyword == 'augment':
-                self.collect_in_substmts(substmt.substmts)
+                target = substmt.i_target_node
+                if target.keyword == 'grouping':
+                    continue
+
+                self.collect_inner_data_nodes(substmt.i_children, filter=submod.i_main_module)
+            elif substmt.keyword == \
+                    ('ietf-yang-structure-ext', 'augment-structure'):
+                self.collect_inner_data_nodes([substmt], filter=submod.main_module())
 
     def collect_in_leaf(self, statement):
         if self.sid_extension:
@@ -975,9 +978,9 @@ class SidFile:
             yield module
             for include in module.search("include"):
                 rev = include.search_one("revision-date")
-                submod = module.i_ctx.get_module(include.arg, rev)
-                if submod is not None:
-                    yield submod
+                submod = module.i_ctx.get_module(include.arg, rev.arg if rev else None)
+                assert submod is not None
+                yield submod
 
         for mod in mod_submod_iter(module):
             imports = mod.search("import")

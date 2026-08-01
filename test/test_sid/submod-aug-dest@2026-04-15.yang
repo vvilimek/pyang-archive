@@ -7,5 +7,16 @@ module submod-aug-dest {
   revision 2026-04-15;
 
   container destination {
+     leaf no-sid-for-me {
+        type uint32;
+     }
+
+     container dest-container-no-sid {
+     }
   }
+
+  leaf no-sid-for-me-either {
+     type string;
+  }
+  container ignored {}
 }
